@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
     <style>
@@ -11,16 +11,17 @@
         right: 0;
         top: 0;
       }
+
     </style>
-  </head>
-  <body>
-    <div id="map"></div>
-    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/georaster"></script>
-    <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
-    <script src="https://unpkg.com/geoblaze"></script>
-    <script src="https://unpkg.com/chroma-js"></script>
-    <script>
+</head>
+<body>
+<div id="map"></div>
+<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+<script src="https://unpkg.com/georaster"></script>
+<script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+<script src="https://unpkg.com/geoblaze"></script>
+<script src="https://unpkg.com/chroma-js"></script>
+<script>
     // initalize leaflet map
     var map = L.map('map');
 
@@ -63,7 +64,7 @@
                   return color;
                 }
                 }).addTo(map)
-            map.fitBounds(layer.getBounds());});
+            map.fitBounds(layer.getBounds());
 
       fetch(url_to_acre_geojson)
         .then(response => response.json())
@@ -74,11 +75,13 @@
 
             map.on('click', function(evt) {
               var latlng = map.mouseEventToLatLng(evt.originalEvent);
-              alert(geoblaze.identify(georaster, [latlng.lng, latlng.lat]));
+              alert("Valor de PM<2.5 = " + geoblaze.identify(georaster, [latlng.lng, latlng.lat]));
+            });
             });
         });
       });
 
-    </script>
-  </body>
+
+</script>
+</body>
 </html>
