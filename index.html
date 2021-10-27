@@ -19,6 +19,7 @@
     <script src="https://unpkg.com/georaster"></script>
     <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
     <script src="https://unpkg.com/geoblaze"></script>
+    <script src="https://unpkg.com/chroma-js"></script>
     <script>
     // initalize leaflet map
     var map = L.map('map');
@@ -34,12 +35,34 @@
       fetch(url_to_geotiff_file)
         .then(response => response.arrayBuffer())
         .then(arrayBuffer => {
-          parseGeoraster(arrayBuffer).then(georaster => {
-            console.log("georaster:", georaster);
+          parseGeoraster(arrayBuffer).then(
+<!--            georaster => {-->
+<!--            console.log("georaster:", georaster);-->
+            georaster => {
+            const min = georaster.mins[0];
+            const max = georaster.maxs[0];
+            const range = georaster.ranges[0];
+
+            // available color scales can be found by running console.log(chroma.brewer);
+<!--            console.log(chroma.brewer);-->
+            var scale = chroma.scale("Viridis");
             var layer = new GeoRasterLayer({
                 georaster: georaster,
-                opacity: 0.7
-            }).addTo(map)
+                opacity: 0.7,
+                pixelValuesToColorFn: function(pixelValues) {
+                  var pixelValue = pixelValues[0]; // there's just one band in this raster
+
+                  // if there's zero wind, don't return a color
+                  if (pixelValue === 0) return null;
+
+                  // scale to 0 - 1 used by chroma
+                  var scaledPixelValue = (pixelValue - min) / range;
+
+                  var color = scale(scaledPixelValue).hex();
+
+                  return color;
+                }
+                }).addTo(map)
             map.fitBounds(layer.getBounds());});
 
       fetch(url_to_acre_geojson)
