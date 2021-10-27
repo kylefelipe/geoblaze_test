@@ -8,14 +8,12 @@ Aliás, desenvolvimento de soluções com dados espaciais com infraestrutura lim
 
 Então, em resumo, a necessidade era: apresentar as imagesn de satelite utilizadas nas reportagens em um mapa dinâmico, sem depender de um servidor de mapas.
 
-Pois foi ao moderar uma sessão da conferência [Free and Open Source Software for Geospatial](https://2021.foss4g.org/) (#FOSS4G) deste ano, que, sem querer me deparei com as possíveis soluções. A solução se chama [Geoblaze](https://geoblaze.io/) e foi apresentada pelo [Daniel Dufour](https://www.linkedin.com/in/danieljdufour). 
+Pois foi ao moderar uma sessão da conferência [Free and Open Source Software for Geospatial](https://2021.foss4g.org/) (#FOSS4G) deste ano, que, sem querer me deparei com as possíveis soluções. A solução se chama [`geoblaze`](https://geoblaze.io/) e foi apresentada pelo [Daniel Dufour](https://www.linkedin.com/in/danieljdufour). 
 
-O geoblaze é um pacote desenvolvido em JavaScript para análise de dados raster. Junto com o [`georaster`](https://github.com/geotiff/georaster) nos permite, usando frontend, carregar uma imagem raster georreferenciada, extrair estatísticas gerais e espaciais, bem como aplicar alguns processamentos, como algebra de bandas.
+O [`geoblaze`](https://geoblaze.io/) é um pacote desenvolvido em JavaScript para análise de dados raster. Junto com o [`georaster`](https://github.com/geotiff/georaster) nos permite, usando frontend, carregar uma imagem raster georreferenciada, extrair estatísticas gerais e espaciais, bem como aplicar alguns processamentos, como algebra de bandas.
 
 > GeoBlaze is a blazing fast raster analysis engine written in pure JavaScript.
 
-Ainda que frontend (e JavaScript) não seja a "minha praia", não consegui conter o entusiasmo e parti para uma prova conceitual. 
-
-[Compartilho a prova de conceito que fiz](https://observablehq.com/@felipesbarros/proof_of_concept_geoblaze), usando o [observablehq](https://observablehq.com) (uma espécie de jupyter-notebook para programação frontend). 
+Ainda que *frontend* (e JavaScript) não seja a "minha praia", não consegui conter o entusiasmo e parti para uma prova conceitual. [Compartilho a prova de conceito que fiz](https://observablehq.com/@felipesbarros/proof_of_concept_geoblaze), usando o [observablehq](https://observablehq.com) (uma espécie de jupyter-notebook para programação frontend).
 
 Espero que seja útil :)
