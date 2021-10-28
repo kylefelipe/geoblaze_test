@@ -1,16 +1,16 @@
 // Get graph element
 const plot = document.getElementById('plotly');
 
-let values = [1, 2, 3, 4];
+let values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 // initalize leaflet map
 let map = new L.map('map');
 
 const url_to_geotiff_file =
-  'https://felipesbarros.github.io/geoblaze_test/pm25_Jul.tif';
+  'https://felipesbarros.github.io/geoblaze_test/mean_pm25_2020.tif'; //pm25_Jul.tif';
 const url_to_geotiff_ts_file =
-  'https://felipesbarros.github.io/geoblaze_test/pm25_timeseries.tif';
+  'https://felipesbarros.github.io/geoblaze_test/pm25_2020.tif'; //pm25_timeseries.tif';
 const url_to_acre_geojson =
-  'https://nominatim.openstreetmap.org/search.php?state=Acre&country=Brazil&polygon_geojson=1&format=json';
+  'https://nominatim.openstreetmap.org/search.php?state=acre&country=brazil&polygon_geojson=1&format=json';
 
 // Acre layer
 let acreData;
@@ -19,6 +19,12 @@ const acreLayer = L.geoJSON().addTo(map);
 // geotif_ts layer
 let geotiffTsData;
 let geotiffTsLayer;
+
+// geotif layer
+let geotiffData;
+let geotiffLayer;
+
+let activeLayer;
 
 // add OpenStreetMap basemap
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -36,74 +42,81 @@ fetch(url_to_geotiff_ts_file)
       geotiffTsData = ts_georaster;
       geotiffTsLayer = new GeoRasterLayer({
         georaster: ts_georaster,
-        opacity: 0.7,
+        opacity: 0,
       }).addTo(map);
-      map.fitBounds(geotiffTsLayer.getBounds());
+      activeLayer = geotiffTsData;
     });
   });
+
+
+//single band raster
+fetch(url_to_geotiff_file)
+  .then((response) => response.arrayBuffer())
+  .then((arrayBuffer) => {
+    parseGeoraster(arrayBuffer).then((georaster) => {
+      const min = georaster.mins[0];
+      const max = georaster.maxs[0];
+      const range = georaster.ranges[0];
+
+      // available color scales can be found by running console.log(chroma.brewer);
+      const scale = chroma.scale('Viridis');
+      geotiffData = georaster;
+      geotiffLayer = new GeoRasterLayer({
+        georaster: geotiffData,
+        opacity: 0.7,
+        pixelValuesToColorFn: function (pixelValues) {
+          const pixelValue = pixelValues[0]; // there's just one band in this raster
+
+          // if there's zero wind, don't return a color
+          if (pixelValue === 0) return null;
+
+          // scale to 0 - 1 used by chroma
+          const scaledPixelValue = (pixelValue - min) / range;
+
+          const color = scale(scaledPixelValue).hex();
+
+          return color;
+        },
+      }).addTo(map);
+    });
+  });
+//   map.invalidateSize();
+
 map.on('click', function (evt) {
   const latlng = map.mouseEventToLatLng(evt.originalEvent);
-  values = geoblaze.identify(geotiffTsData, [latlng.lng, latlng.lat]);
+  values = geoblaze.identify(activeLayer, [latlng.lng, latlng.lat]);
   console.log('Valor de PM<2.5 :', values);
   plotData();
 });
-// single band raster
-//     fetch(url_to_geotiff_file)
-//       .then(response => response.arrayBuffer())
-//       .then(arrayBuffer => {
-//         parseGeoraster(arrayBuffer).then(
-//           georaster => {
-//           const min = georaster.mins[0];
-//           const max = georaster.maxs[0];
-//           const range = georaster.ranges[0];
 
-//           // available color scales can be found by running console.log(chroma.brewer);
-//           var scale = chroma.scale("Viridis");
-//           var layer = new GeoRasterLayer({
-//               georaster: georaster,
-//               opacity: 0.7,
-//               pixelValuesToColorFn: function(pixelValues) {
-//                 var pixelValue = pixelValues[0]; // there's just one band in this raster
-
-//                 // if there's zero wind, don't return a color
-//                 if (pixelValue === 0) return null;
-
-//                 // scale to 0 - 1 used by chroma
-//                 var scaledPixelValue = (pixelValue - min) / range;
-
-//                 var color = scale(scaledPixelValue).hex();
-
-//                 return color;
-//               }
-//               }).addTo(map)
-//           map.fitBounds(layer.getBounds());
-
-//         });
-//         fetch(url_to_acre_geojson)
-//           .then(response => response.json())
-//           .then(data => {
-//               console.log("Acre:", data[0].geojson);
-//               var acreLayer = new L.geoJSON(
-//                 data[0].geojson).addTo(map);
-//               });
-//     });
-// map.invalidateSize();
-//
 // Graph
 function plotData() {
   // função que gera um gráfico quando os dados são passados
-  var trace = {
+  const trace = {
     type: 'scatter',
     mode: 'lines',
     name: 'y',
-    x: ['2020-7', '2020-8', '2020-9', '2020-10'],
+    x: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dic',
+    ],
     y: values,
     line: { color: '#FF0000' },
   };
 
   const data = [trace];
 
-  var layout = {
+  const layout = {
     title: 'Mean Monthly Air Polution (pm<2.5) for Acre state',
     height: 525,
     width: 800,
@@ -121,7 +134,7 @@ window.onload = () => {
     .then((data) => {
       acreData = data[0].geojson;
       acreLayer.addData(acreData);
+      map.fitBounds(acreLayer.getBounds());
     });
-  //  console.log('>>: ',acreData);
   plotData();
 };
