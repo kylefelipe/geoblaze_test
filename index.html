@@ -1,27 +1,65 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
-    <style>
-      #map {
-        bottom: 0;
-        left: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
-      }
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    </style>
+    <title>Análise espacial no frontend</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <!-- Font-awesome -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
+<style>
+#map {
+    width: 800px;
+    height: 525px;
+    }
+
+</style>
 </head>
 <body>
-<div id="map"></div>
+<script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
 <script src="https://unpkg.com/georaster"></script>
 <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
 <script src="https://unpkg.com/geoblaze"></script>
 <script src="https://unpkg.com/chroma-js"></script>
+
+<div class="container-fluid">
+    <div class = "jumbotron">
+        <div class = "container">
+            <h1>Análise exploratória de dados espaciais no frontend</h1>
+            <p> Análise eploratória dos dados espaiciais do projeto <a href="https://infoamazonia.org/project/engolindo-fumaca/">Engolindo Fumaça</a>.</p>
+            <p> Página não oficia construida como prova de conceito e estudo sobre as possibilidades ed análise espaciais usando apenas tecnologias frontend.</p>
+            <p>
+                <a href="https://github.com/FelipeSBarros/geoblaze_test">GitHub</a>
+            </p>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm">
+            <div id="map">
+            </div>
+        </div>
+        <div class="col-sm">
+            <div id="plotly" style="width:600px;height:250px;">
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+georaster1 = geoblaze.load("https://s3.amazonaws.com/geoblaze/RWA_MNH_ANC.tif")
+georaster1.toCanvas({ height: 500, width: 500 })
+<!--borders = fetch("https://s3.amazonaws.com/geoblaze/kigali.geojson").then(response => response.json())-->
+<!--result = geoblaze.median(georaster1, borders)[0]-->
+<!--console.log(result);-->
+<!--var georastertimeSeries = geoblaze.load("https://felipesbarros.github.io/geoblaze_test/pm25_timeseries.tif")-->
+<!--console.log(geoblaze.identify(georastertimeSeries, [-1.7575368113083125, -59.15039062500001]))-->
     // initalize leaflet map
     var map = L.map('map');
 
@@ -31,21 +69,32 @@
       }).addTo(map);
 
       var url_to_geotiff_file = "https://felipesbarros.github.io/geoblaze_test/pm25_Jul.tif";
+      var url_to_geotiff_ts_file = "https://felipesbarros.github.io/geoblaze_test/pm25_timeseries.tif";
       var url_to_acre_geojson = "https://nominatim.openstreetmap.org/search.php?state=Acre&country=Brazil&polygon_geojson=1&format=json";
 
+      // Timeseries raster
+      fetch(url_to_geotiff_ts_file)
+         .then(response => response.arrayBuffer())
+            .then(arrayBuffer => {
+                parseGeoraster(arrayBuffer).then(ts_georaster => {
+                    console.log("ts_georaster:", ts_georaster)
+                    console.log(
+                        geoblaze.identify(
+                            ts_georaster[0], [-1.7575368113083125, -59.15039062500001]));
+                    })});
+
+
+      // single band raster
       fetch(url_to_geotiff_file)
         .then(response => response.arrayBuffer())
         .then(arrayBuffer => {
           parseGeoraster(arrayBuffer).then(
-<!--            georaster => {-->
-<!--            console.log("georaster:", georaster);-->
             georaster => {
             const min = georaster.mins[0];
             const max = georaster.maxs[0];
             const range = georaster.ranges[0];
 
             // available color scales can be found by running console.log(chroma.brewer);
-<!--            console.log(chroma.brewer);-->
             var scale = chroma.scale("Viridis");
             var layer = new GeoRasterLayer({
                 georaster: georaster,
@@ -76,12 +125,36 @@
             map.on('click', function(evt) {
               var latlng = map.mouseEventToLatLng(evt.originalEvent);
               alert("Valor de PM<2.5 = " + geoblaze.identify(georaster, [latlng.lng, latlng.lat]));
+              console.log("Valor de PM<2.5 :", geoblaze.identify(ts_georaster, [latlng.lng, latlng.lat]));
             });
             });
         });
       });
+  map.invalidateSize();
 
+<!--Graph-->
+{
+  var trace = {
+    type: "scatter",
+    mode: "lines",
+    name: 'y',
+    x: ["2020-7", "2020-8", "2020-9", "2020-10"],
+    y: [1,2,3,4],
+    line: {color: '#FF0000'}
+  }
 
+  var data = [trace];
+
+  var layout = {
+    title: 'Mean Monthly Air Polution (pm<2.5) for Acre state',
+    height: 525,
+    width: 800
+  };
+
+  plot = document.getElementById('plotly');
+  Plotly.newPlot(plot, data, layout);
+
+}
 </script>
 </body>
 </html>
