@@ -1,168 +1,81 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
 
     <title>Análise espacial no frontend</title>
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
     <!-- Font-awesome -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"/>
-<style>
-#map {
-    width: 800px;
-    height: 525px;
-    }
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css"
+    />
+    <style>
+      #map {
+        width: 800px;
+        height: 525px;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/georaster"></script>
+    <script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
+    <script src="https://unpkg.com/geoblaze"></script>
+    <script src="https://unpkg.com/chroma-js"></script>
 
-</style>
-</head>
-<body>
-<script src="https://cdn.plot.ly/plotly-2.4.2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-<script src="https://unpkg.com/georaster"></script>
-<script src="https://unpkg.com/georaster-layer-for-leaflet"></script>
-<script src="https://unpkg.com/geoblaze"></script>
-<script src="https://unpkg.com/chroma-js"></script>
-
-<div class="container-fluid">
-    <div class = "jumbotron">
-        <div class = "container">
-            <h1>Análise exploratória de dados espaciais no frontend</h1>
-            <p> Análise exploratória dos dados espaciais do projeto <a href="https://infoamazonia.org/project/engolindo-fumaca/">Engolindo Fumaça</a>.</p>
-            <p> Página não oficial construida como prova de conceito e estudo sobre as possibilidades de análises espaciais usando apenas tecnologias frontend.</p>
-            <p>
-                <a href="https://github.com/FelipeSBarros/geoblaze_test">GitHub</a>
-            </p>
+    <div class="container-fluid">
+      <div class="jumbotron">
+        <div class="container">
+          <h1>Análise exploratória de dados espaciais no frontend</h1>
+          <p>
+            Análise exploratória dos dados espaciais do projeto
+            <a href="https://infoamazonia.org/project/engolindo-fumaca/"
+              >Engolindo Fumaça</a
+            >.
+          </p>
+          <p>
+            Página não oficial construida como prova de conceito e estudo sobre
+            as possibilidades de análises espaciais usando apenas tecnologias
+            frontend.
+          </p>
+          <p>
+            <a href="https://github.com/FelipeSBarros/geoblaze_test">GitHub</a>
+          </p>
         </div>
-    </div>
-    <div class="row">
+      </div>
+      <div class="row">
         <div class="col-sm">
-            <div id="map">
-            </div>
+          <div id="map"></div>
         </div>
         <div class="col-sm">
-            <div id="plotly" style="width:600px;height:250px;">
-            </div>
+          <div id="plotly" style="width: 600px; height: 250px"></div>
         </div>
+      </div>
     </div>
-</div>
 
-<script>
-    var values = [1,2,3,4]
-    // initalize leaflet map
-    var map = L.map('map');
-
-    // add OpenStreetMap basemap
-    L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-      }).addTo(map);
-
-      var url_to_geotiff_file = "https://felipesbarros.github.io/geoblaze_test/pm25_Jul.tif";
-      var url_to_geotiff_ts_file = "https://felipesbarros.github.io/geoblaze_test/pm25_timeseries.tif";
-      var url_to_acre_geojson = "https://nominatim.openstreetmap.org/search.php?state=Acre&country=Brazil&polygon_geojson=1&format=json";
-
-      // Timeseries raster
-      fetch(url_to_geotiff_ts_file)
-         .then(response => response.arrayBuffer())
-            .then(arrayBuffer => {
-                parseGeoraster(arrayBuffer)
-                .then(ts_georaster => {
-<!--                    console.log("ts_georaster:", ts_georaster)-->
-<!--                    console.log(-->
-<!--                        geoblaze.identify(-->
-<!--                            ts_georaster, [-1.7575368113083125, -59.15039062500001]));-->
-                    var layer = new GeoRasterLayer({
-                        georaster: ts_georaster,
-                        opacity: 0.7})
-                        .addTo(map)
-                    map.fitBounds(layer.getBounds());
-
-      map.on('click', function(evt) {
-        var latlng = map.mouseEventToLatLng(evt.originalEvent);
-<!--        alert("Valor de PM<2.5 = " + geoblaze.identify(georaster, [latlng.lng, latlng.lat]));-->
-<!--        console.log("Valor de PM<2.5 :", geoblaze.identify(ts_georaster, [latlng.lng, latlng.lat]));-->
-        var values = geoblaze.identify(ts_georaster, [latlng.lng, latlng.lat]);
-        console.log("Valor de PM<2.5 :", values);
-
-        });
-                    })
-                    });
-
-
-      // single band raster
-<!--      fetch(url_to_geotiff_file)-->
-<!--        .then(response => response.arrayBuffer())-->
-<!--        .then(arrayBuffer => {-->
-<!--          parseGeoraster(arrayBuffer).then(-->
-<!--            georaster => {-->
-<!--            const min = georaster.mins[0];-->
-<!--            const max = georaster.maxs[0];-->
-<!--            const range = georaster.ranges[0];-->
-
-<!--            // available color scales can be found by running console.log(chroma.brewer);-->
-<!--            var scale = chroma.scale("Viridis");-->
-<!--            var layer = new GeoRasterLayer({-->
-<!--                georaster: georaster,-->
-<!--                opacity: 0.7,-->
-<!--                pixelValuesToColorFn: function(pixelValues) {-->
-<!--                  var pixelValue = pixelValues[0]; // there's just one band in this raster-->
-
-<!--                  // if there's zero wind, don't return a color-->
-<!--                  if (pixelValue === 0) return null;-->
-
-<!--                  // scale to 0 - 1 used by chroma-->
-<!--                  var scaledPixelValue = (pixelValue - min) / range;-->
-
-<!--                  var color = scale(scaledPixelValue).hex();-->
-
-<!--                  return color;-->
-<!--                }-->
-<!--                }).addTo(map)-->
-<!--            map.fitBounds(layer.getBounds());-->
-
-<!--      fetch(url_to_acre_geojson)-->
-<!--        .then(response => response.json())-->
-<!--        .then(data => {-->
-<!--            console.log("Acre:", data[0].geojson);-->
-<!--            var acreLayer = new L.geoJSON(-->
-<!--              data[0].geojson).addTo(map);-->
-<!--            });-->
-<!--        });-->
-<!--      });-->
-<!--  map.invalidateSize();-->
-
-<!--Graph-->
-{
-  var trace = {
-    type: "scatter",
-    mode: "lines",
-    name: 'y',
-    x: ["2020-7", "2020-8", "2020-9", "2020-10"],
-    y: values,
-    line: {color: '#FF0000'}
-  }
-
-  var data = [trace];
-
-  var layout = {
-    title: 'Mean Monthly Air Polution (pm<2.5) for Acre state',
-    height: 525,
-    width: 800
-  };
-
-  plot = document.getElementById('plotly');
-  Plotly.newPlot(plot, data, layout);
-  function adjustValue1(values) {
-    data[0]['y'] = values;
-    Plotly.restyle('plotly');
-}
-
-}
-</script>
-</body>
+    <script src="geoblase_test.js"></script>
+  </body>
 </html>
