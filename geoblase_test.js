@@ -1,7 +1,7 @@
 // Get graph element
 const plot = document.getElementById('plotly');
 
-let values = [0, 0, 0, 0];
+let values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 // initalize leaflet map
 const map = L.map('map');
 
@@ -12,9 +12,9 @@ L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 }).addTo(map);
 
 const url_to_geotiff_file =
-  'https://felipesbarros.github.io/geoblaze_test/pm25_Jul.tif';
+  'https://felipesbarros.github.io/geoblaze_test/mean_pm25_2020.tif';//pm25_Jul.tif';
 const url_to_geotiff_ts_file =
-  'https://felipesbarros.github.io/geoblaze_test/pm25_timeseries.tif';
+  'https://felipesbarros.github.io/geoblaze_test/pm25_2020.tif';//pm25_timeseries.tif';
 const url_to_acre_geojson =
   'https://nominatim.openstreetmap.org/search.php?state=amazon+acre&country=brazil&polygon_geojson=1&format=json';
 
@@ -95,7 +95,7 @@ function plotData() { // função que gera um gráfico quando os dados são pass
     type: 'scatter',
     mode: 'lines',
     name: 'y',
-    x: ['Jul', 'Aug', 'Sep', 'Oct'],
+    x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dic'],
     y: values,
     line: { color: '#FF0000' },
   };
