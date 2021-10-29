@@ -91,16 +91,25 @@ fetch(url_to_geotiff_ts_file)
 //
 // Graph
 function plotData() { // função que gera um gráfico quando os dados são passados
+  var traceWHO = {
+    type: 'scatter',
+    mode: 'lines',
+    name: 'WHO',
+    x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dic'],
+    y: [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25],
+    line: { color: '#000000',
+            dash: 'dot'},
+  }
   var trace = {
     type: 'scatter',
     mode: 'lines',
-    name: 'y',
+    name: 'pm<2.5',
     x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dic'],
     y: values,
     line: { color: '#FF0000' },
   };
   
-  const data = [trace];
+  const data = [trace, traceWHO];
   
   var layout = {
     title: 'Mean Monthly Air Polution (pm<2.5) for Acre state',
