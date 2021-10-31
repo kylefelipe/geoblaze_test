@@ -16,7 +16,13 @@ Pois foi ao moderar uma sessão da conferência [Free and Open Source Software f
 
 Dessa forma, com essa stack the bibliotecas poderemos carregar uma imagem raster georreferenciada, extrair estatísticas gerais e espaciais, bem como aplicar alguns processamentos, como algebra de bandas e apresentá-las em um webmap `leaflet`. Tudo isso sem depender de uma infraestrutura de *backend*. Tudo sendo processado no *frontend*. Sim, essa solução pode ser limitada para alguns casos. Mas nem todos. 
 
-E, por isso, decidi explorar essa alternativa, ainda que *frontend* (e JavaScript) não seja a "minha praia". A verdade é que não consegui conter o entusiasmo e parti para uma prova conceitual. [Compartilho a prova de conceito que fiz](https://observablehq.com/@felipesbarros/proof_of_concept_geoblaze), usando o [observablehq](https://observablehq.com) (uma espécie de *jupyter-notebook* para programação *frontend*). Aproveitei para consolidar o resultado em uma [landingpage, que pode ser vista aqui](https://felipesbarros.github.io/geoblaze_test/) e, é lógico: tenho tudo documentado no [github](https://github.com/felipesbarros/geoblaze_test/).
+E, por isso, decidi explorar essa alternativa, ainda que *frontend* (e JavaScript) não seja a "minha praia". A verdade é que não consegui conter o entusiasmo e parti para uma prova conceitual. [Compartilho a prova de conceito que fiz](https://observablehq.com/@felipesbarros/proof_of_concept_geoblaze), usando o [observablehq](https://observablehq.com) (uma espécie de *jupyter-notebook* para programação *frontend*). 
+
+Aproveitei para consolidar o resultado em uma [*landingpage*, que pode ser vista aqui](https://felipesbarros.github.io/geoblaze_test/). Nela, além de apresentar o raster, foi possível garantir que o usuário possa interagir com o mesmo. ao clicar em um pixels, O gráfico é atualizado com o comportamento temporal daquela área, apresentando, ainda o valor máximo sugerido pela Organização Mundial da Saúde.
+
+![](./img/landingpage.png)
+
+E, é lógico: tenho tudo documentado no [github](https://github.com/felipesbarros/geoblaze_test/).
 
 Não posso deixar de mencionar que o [protótipo final](https://felipesbarros.github.io/geoblaze_test/) só foi possível com a ajuda do [Kyle Felipe](https://github.com/kylefelipe)
 
