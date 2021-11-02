@@ -48,7 +48,6 @@ fetch(url_to_geotiff_ts_file)
     });
   });
 
-
 //single band raster
 fetch(url_to_geotiff_file)
   .then((response) => response.arrayBuffer())
