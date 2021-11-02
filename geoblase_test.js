@@ -1,6 +1,6 @@
 // Get graph element
 const plot = document.getElementById('plotly');
-
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 let values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
 // initalize leaflet map
 let map = new L.map('map');
@@ -94,7 +94,7 @@ function plotData() { // função que gera um gráfico quando os dados são pass
     type: 'scatter',
     mode: 'lines',
     name: 'WHO',
-    x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dic'],
+    x: MONTHS,
     y: [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25],
     line: { color: '#000000',
             dash: 'dot'},
@@ -103,7 +103,7 @@ function plotData() { // função que gera um gráfico quando os dados são pass
     type: 'scatter',
     mode: 'lines',
     name: 'pm<2.5',
-    x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dic'],
+    x: MONTHS,
     y: values,
     line: { color: '#FF0000' },
   };
