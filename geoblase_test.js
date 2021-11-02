@@ -89,32 +89,27 @@ map.on('click', function (evt) {
 });
 
 // Graph
-function plotData() {
-  // função que gera um gráfico quando os dados são passados
+function plotData() { // função que gera um gráfico quando os dados são passados
+  const traceWHO = {
+    type: 'scatter',
+    mode: 'lines',
+    name: 'WHO',
+    x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dic'],
+    y: [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25],
+    line: { color: '#000000',
+            dash: 'dot'},
+  }
   const trace = {
     type: 'scatter',
     mode: 'lines',
-    name: 'y',
-    x: [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dic',
-    ],
+    name: 'pm<2.5',
+    x: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dic'],
     y: values,
     line: { color: '#FF0000' },
   };
-
-  const data = [trace];
-
+  
+  const data = [trace, traceWHO];
+  
   const layout = {
     title: 'Mean Monthly Air Polution (pm<2.5) for Acre state',
     height: 525,

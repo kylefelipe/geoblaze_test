@@ -6,14 +6,24 @@ Ainda que o projeto tenha sido um sucesso (inclusive, foi um dos finalistas do [
 
 Aliás, desenvolvimento de soluções com dados espaciais com infraestrutura limitada tem sido um tema explorado por mim em [alguns artigos](https://felipesbarros.github.io/pt/).
 
-Então, em resumo, a necessidade era: apresentar as imagens de satélite utilizadas nas reportagens em um mapa dinâmico, sem depender de um servidor de mapas.
+Então, em resumo, a necessidade era: apresentar as imagens de satélite utilizadas nas reportagens em um mapa dinâmico, sem depender de um servidor de mapas, para que os leitores da matéria pudessem explorar os dados. Algo similar a um *dashboard*.
 
-Pois foi ao moderar uma sessão da conferência [Free and Open Source Software for Geospatial](https://2021.foss4g.org/) (#FOSS4G) deste ano, que, sem querer me deparei com as possíveis soluções. A solução se chama [`geoblaze`](https://geoblaze.io/) e foi apresentada pelo [Daniel Dufour](https://www.linkedin.com/in/danieljdufour). 
+Pois foi ao moderar uma sessão da conferência [Free and Open Source Software for Geospatial](https://2021.foss4g.org/) (#FOSS4G) deste ano que, sem querer, me deparei com as possíveis soluções. A solução seria transportar a responsabilidade de carregar, apresentar e calcular algumas estatísticas ao *frontend*, usando o conjunto de bibliotecas [`georaster`](https://github.com/geotiff/georaster), [`georaster-layer-for-leaflet`](https://github.com/GeoTIFF/georaster-layer-for-leaflet) e [`geoblaze`](https://geoblaze.io/). A apresentação que me dispertou para essas ferramentas foi feita pelo [Daniel Dufour](https://www.linkedin.com/in/danieljdufour) sobre o [`geoblaze`](https://geoblaze.io/).
 
-O [`geoblaze`](https://geoblaze.io/) é um pacote desenvolvido em JavaScript para análise de dados raster. Junto com o [`georaster`](https://github.com/geotiff/georaster) nos permite, usando frontend, carregar uma imagem raster georreferenciada, extrair estatísticas gerais e espaciais, bem como aplicar alguns processamentos, como algebra de bandas.
+* [`georaster`](https://github.com/geotiff/georaster) é uma biblioteca JavaScript que nos permite carrregar, e até mesmo criar, dados raster a partir de objetos JavaScript;  
+* [`georaster-layer-for-leaflet`](https://github.com/GeoTIFF/georaster-layer-for-leaflet) é uma biblioteca que nos permite apresentar dados `raster` (a princípio geotif) nos mapas feitos em [`leaflet`](https://leafletjs.com/);  
+* [`geoblaze`](https://geoblaze.io/) é um pacote desenvolvido em JavaScript para permitir analisar dados carregados como georaster.
 
-> GeoBlaze is a blazing fast raster analysis engine written in pure JavaScript.
+Dessa forma, com essa stack the bibliotecas poderemos carregar uma imagem raster georreferenciada, extrair estatísticas gerais e espaciais, bem como aplicar alguns processamentos, como algebra de bandas e apresentá-las em um webmap `leaflet`. Tudo isso sem depender de uma infraestrutura de *backend*. Tudo sendo processado no *frontend*. Sim, essa solução pode ser limitada para alguns casos. Mas nem todos. 
 
-Ainda que *frontend* (e JavaScript) não seja a "minha praia", não consegui conter o entusiasmo e parti para uma prova conceitual. [Compartilho a prova de conceito que fiz](https://observablehq.com/@felipesbarros/proof_of_concept_geoblaze), usando o [observablehq](https://observablehq.com) (uma espécie de jupyter-notebook para programação frontend). Aproveitei para consolidar o resultado em uma [landingpage, que pode ser vista aqui](https://felipesbarros.github.io/geoblaze_test/) e, é lógico: tenho tudo documentado no [github](https://github.com/felipesbarros/geoblaze_test/).
+E, por isso, decidi explorar essa alternativa, ainda que *frontend* (e JavaScript) não seja a "minha praia". A verdade é que não consegui conter o entusiasmo e parti para uma prova conceitual. [Compartilho a prova de conceito que fiz](https://observablehq.com/@felipesbarros/proof_of_concept_geoblaze), usando o [observablehq](https://observablehq.com) (uma espécie de *jupyter-notebook* para programação *frontend*). 
+
+Aproveitei para consolidar o resultado em uma [*landingpage*, que pode ser vista aqui](https://felipesbarros.github.io/geoblaze_test/). Nela, além de apresentar o raster, foi possível garantir que o usuário possa interagir com o mesmo. ao clicar em um pixels, O gráfico é atualizado com o comportamento temporal daquela área, apresentando, ainda o valor máximo sugerido pela Organização Mundial da Saúde.
+
+![](./img/landingpage.png)
+
+E, é lógico: tenho tudo documentado no [github](https://github.com/felipesbarros/geoblaze_test/).
+
+Não posso deixar de mencionar que o [protótipo final](https://felipesbarros.github.io/geoblaze_test/) só foi possível com a ajuda do [Kyle Felipe](https://github.com/kylefelipe)
 
 Espero que seja útil :)
