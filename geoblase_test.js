@@ -123,6 +123,7 @@ function plotData() { // função que gera um gráfico quando os dados são pass
   }
 }
 window.onload = () => {
+  // getting Acre polygon and use its bounds as map bounds
   fetch(url_to_acre_geojson)
     .then((response) => response.json())
     .then((data) => {
