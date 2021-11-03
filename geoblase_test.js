@@ -1,20 +1,89 @@
 // Get graph element
 const plot = document.getElementById('plotly');
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTHS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 let values = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+// Peguei os valores quando gerei o mapa pela primeira vez
+const MAPBOUNDS = {
+  southWest: {
+    lat: -18.0415597,
+    lng: -73.9830625,
+  },
+  northEast: {
+    lat: 5.2693306,
+    lng: -45.6969781,
+  },
+};
 // initalize leaflet map
 let map = new L.map('map');
+map.fitBounds(L.latLngBounds(MAPBOUNDS.southWest, MAPBOUNDS.northEast));
+
+const LEGALAMAZON = [
+  'Rondônia',
+  'Acre',
+  'Amazonas',
+  'Roraima',
+  'Pará',
+  'Amapá',
+  'Tocantins',
+  'Mato Grosso',
+];
 
 const url_to_geotiff_file =
   'https://felipesbarros.github.io/geoblaze_test/mean_pm25_2020.tif'; //pm25_Jul.tif';
 const url_to_geotiff_ts_file =
   'https://felipesbarros.github.io/geoblaze_test/pm25_2020.tif'; //pm25_timeseries.tif';
-const url_to_acre_geojson =
-  'https://nominatim.openstreetmap.org/search.php?state=acre&country=brazil&polygon_geojson=1&format=json';
 
-// Acre layer
-let acreData;
-const acreLayer = L.geoJSON().addTo(map);
+let selectedState;
+let lastClickedLayer;
+
+//functions
+function onEachFeature(featureData, featureLayer) {
+  // Function to be set at each GeoJSON
+  // https://embed.plnkr.co/plunk/TcyDGH
+  featureLayer.on('click', () => {
+    if(lastClickedLayer) {
+      // reset layer to default style
+      statesLayer.resetStyle(lastClickedLayer);
+    }
+    lastClickedLayer = featureLayer;
+    values = geoblaze.mean(activeLayer, featureData.geometry);
+    selectedState = featureData.properties.name;
+    // set polygon line to red
+    featureLayer.setStyle({ color: '#88292F' });
+
+    if (!L.Browser.ie && !L.Browser.opera && !L.Browser.edge) {
+      featureLayer.bringToFront();
+    }
+
+    plotData();
+  });
+}
+
+function style() {
+  // Default layer style
+  return {
+    fillOpacity: 0,
+  };
+}
+// States Data
+let statesData;
+const statesLayer = L.geoJSON(statesData, {
+  style,
+  onEachFeature: onEachFeature,
+}).addTo(map);
 
 // geotif_ts layer
 let geotiffTsData;
@@ -79,26 +148,18 @@ fetch(url_to_geotiff_file)
       }).addTo(map);
     });
   });
-//   map.invalidateSize();
-
-map.on('click', function (evt) {
-  const latlng = map.mouseEventToLatLng(evt.originalEvent);
-  values = geoblaze.identify(activeLayer, [latlng.lng, latlng.lat]);
-  console.log('Valor de PM<2.5 :', values);
-  plotData();
-});
 
 // Graph
-function plotData() { // função que gera um gráfico quando os dados são passados
+function plotData() {
+  // função que gera um gráfico quando os dados são passados
   const traceWHO = {
     type: 'scatter',
     mode: 'lines',
     name: 'WHO',
     x: MONTHS,
     y: [25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25, 25],
-    line: { color: '#000000',
-            dash: 'dot'},
-  }
+    line: { color: '#000000', dash: 'dot' },
+  };
   const trace = {
     type: 'scatter',
     mode: 'lines',
@@ -107,11 +168,13 @@ function plotData() { // função que gera um gráfico quando os dados são pass
     y: values,
     line: { color: '#FF0000' },
   };
-  
+
   const data = [trace, traceWHO];
-  
+  const title = selectedState
+    ? `Mean Monthly Air Polution (pm<2.5) for ${selectedState} state`
+    : 'Click on a state';
   const layout = {
-    title: 'Mean Monthly Air Polution (pm<2.5) for Acre state',
+    title,
     height: 525,
     width: 800,
   };
@@ -122,14 +185,45 @@ function plotData() { // função que gera um gráfico quando os dados são pass
     Plotly.restyle('plotly');
   }
 }
+
 window.onload = () => {
-  // getting Acre polygon and use its bounds as map bounds
-  fetch(url_to_acre_geojson)
-    .then((response) => response.json())
-    .then((data) => {
-      acreData = data[0].geojson;
-      acreLayer.addData(acreData);
-      map.fitBounds(acreLayer.getBounds());
+  // getting all states polygons
+  const allStates = []; // all states promisses
+  for (stIdx = 0; stIdx < LEGALAMAZON.length; stIdx += 1) {
+    const state = LEGALAMAZON[stIdx];
+    const url_satate_geojson = `https://nominatim.openstreetmap.org/search.php?state=${state}&country=brazil&polygon_geojson=1&format=json`;
+    allStates.push(
+      fetch(url_satate_geojson).then((response) => response.json()),
+    );
+  }
+  // fetch all data
+  Promise.all(allStates)
+    .then((values) => {
+      // Parsing all values fetched as a geojson
+      // https://geojson.org/
+      const data = values.map((value) => {
+        const [val, ..._] = value;
+        const { geojson, boundingbox, lat, lon, ...others } = val;
+        const feature = {
+          // creates a geojson feature with it's geometry
+          type: 'Feature',
+          geometry: geojson,
+        };
+        feature.properties = {
+          // creates feature properties
+          ...others,
+          boundingBox: { type: 'Polygon', coordinates: boundingbox },
+          centroid: { type: 'Point', lat, lon },
+          name: others.display_name.split(',')[0],
+        };
+        return feature;
+      });
+      statesData = L.layerGroup(data);
+      statesLayer.addData(data);
+      statesLayer.setStyle({ fillOpacity: 0 });
+    })
+    .catch((err) => {
+      console.log('Error: ', err);
     });
   plotData();
 };
